@@ -12,19 +12,23 @@ class Lampada{
         this.potencia = potencia;
         this.durabilidade = durabilidade;}
 
+    public String toString() {
+        return "Status: inteira = "+this.inteira+" | potência = "+this.potencia+" | durabilidade = "+this.durabilidade;}
+
     void quebraLampada(Lampada lampada) {
         Random meninofei = new Random();// chance de menino fei quebrar a lampada.
         int foiQuebrada = meninofei.nextInt(10);
         if (foiQuebrada > 8) {
-            inteira = false;
-            System.out.println("Um menino fei quebrou a lampada, presisamos troca-lá !\n");}
-        toString(lampada);}
-
+            lampada.inteira = false;
+            lampada.durabilidade = 0;
+            System.out.println("Um menino fei quebrou a lampada, presisamos troca-lá !\n");
+            return;}
+        }
     void durasaoLampada(Lampada lampada){
         lampada.durabilidade--;
         if (lampada.durabilidade == 0) {
             System.out.println("\nIh, a lampada ficou muito velha, queimou...\nChama lá o estágiario pra trocar");
-            toString(lampada);}
+            return;}
     }
     int getPotencia(){
         return this.potencia;}
@@ -39,16 +43,15 @@ class Lampada{
         this.durabilidade = d;}
     public void setInteira(boolean i){
         this.inteira = i;}
-
-    public String toString(Lampada lampada) {
-        return "Status: inteira = "+lampada.inteira+" | potência = "+lampada.potencia;}
 }
 public class Poste{
-    int potencia;
+    int potencia;// 1) para Fraca | 2) para Forte
+    int tamanho;// 1) para Pequeno | 2) para Grande
     boolean emPe = true;
 
-    Poste(int potencia){
-        this.potencia = potencia;}
+    Poste(int potencia, int tamanho){
+        this.potencia = potencia;
+        this.tamanho = tamanho;}
 
     void posteCaiu(Poste poste, Lampada lampada){
         Random ventania = new Random();
@@ -56,40 +59,34 @@ public class Poste{
         if (forsaVento > 9) {
             poste.emPe = false;
             lampada.setInteira(false);
-            System.out.println("\nVish, que vento forte, o poste caiu, precisamo trocar tudo agora.");
+            System.out.println("Vish, bateu um vento forte, o poste caiu, precisamos trocar tudo agora.");
+            return;
         }else{
             System.out.println("\nHum, bom, o poste continua de pé.");}
         }
     void posteVsLampada(Poste poste, Lampada lampada){
         if (poste.potencia > lampada.potencia) {//aqui compara as potências
-            System.out.println("\nEita, a lampada Explodiu, use uma de mesma potência.");       
             lampada.inteira = false;
-            lampada.toString(lampada);
+            System.out.println("Eita, a lampada Explodiu, use uma de mesma potência.\n");     
+            return; 
         } if(poste.potencia < lampada.potencia){
-            System.out.println("\nEssa lampada tá meio apagada, use uma de menor potência.");
             lampada.durabilidade--;
-            lampada.toString(lampada);
+            System.out.println("Essa lampada tá meio apagada, use uma de menor potência.\n");
+            return;
+        } if (poste.tamanho > lampada.tamanho) {// aqui compara os tamanhos
+            System.out.println("Essa lampada é meio pequena para esse poste !\n");
+            return; 
         } else {
-            System.out.println("\nLinda e Brilhante, do jeito que o povo gosta");
             lampada.durabilidade--;
-            lampada.toString(lampada);}
+            System.out.println("Linda e Brilhante, do jeito que o povo gosta\n");}
         }
-    void trocaLampada(Lampada lampada, Lampada lampada2) {
-        if (lampada.inteira == true && lampada.durabilidade > 0) {
-            System.out.println("Não precisa, ela ainda está funcionando.");
-        } else {
-            System.out.println("\nLampada trocada com sucesso !");
-            lampada = lampada2;}
-        }
-    void diaAdia(Poste poste, Lampada lampada){
-        System.out.println("\nAlguns dias se passaram, o que será q aconteceu ?\n");
-        for (int i = 0; i < 10; i++) {
-            System.out.println("Dia "+i+": ");
-            posteCaiu(poste, lampada);
+    void diaAdia(Poste poste, Lampada lampada){//agregador das funções
+        System.out.println("um dia se passou, o que será q aconteceu ?\n");
+            poste.posteCaiu(poste, lampada);
             lampada.durasaoLampada(lampada);
             lampada.quebraLampada(lampada);
-            lampada.toString(lampada);}
-    }
+            System.out.println(lampada.toString());}
+
     public static void main(String[] args) {
         Lampada lampada = new Lampada(2, 2, 0);
         lampada.durasaoLampada(lampada);
@@ -101,17 +98,31 @@ public class Poste{
         int tamanho = leitor.nextInt();
         System.out.println("Qual a potência da lampada ? 1) para Fraca | 2) para Forte: ");
         int potencia = leitor.nextInt();
+        System.out.println("Ela dura quanto tempo ? (numero de dias): ");
 
-        System.out.println("Qual era a potência do poste mesmo ? ");
+        System.out.println("Qual era a potência do poste mesmo ? 1) para Fraca | 2) para Forte: ");
+        int potenp = leitor.nextInt();
+        System.out.println("Qual a altura dele ? 1) para Pequeno | 2) para Grande:");
         int altura = leitor.nextInt();
-        leitor.close();
+
+        System.out.println("Certo, vamos trocar essa bagaça !\n");
 
         Lampada lampada2 = new Lampada(tamanho, potencia, 10);
-        Poste poste = new Poste(altura);
-
+        Poste poste = new Poste(potenp, altura);
         poste.posteVsLampada(poste, lampada2);
-
-        System.out.println("\nCerto, vamos trocar essa bagaça");
     
-        poste.diaAdia(poste, lampada2);}
+        boolean y;
+        do {//aqui faz-se um ciclo das funções
+            int x;
+            System.out.println("\nDeseja ver o próximo dia ? 1) para sim | 2) para não" );
+            x = leitor.nextInt();
+            if (x == 1) {
+                y = true;
+                poste.diaAdia(poste, lampada2);
+            } else {
+                y = false;
+                return;}
+        } while (y == true);
+        
+        leitor.close();}
 }
